@@ -18,7 +18,7 @@ class UserRegistrationController extends Controller
 
         $user = $userRepository->create($request);
 
-        return response()->json(['user' => $user], Response::HTTP_CREATED);
+        return response()->json( ['data' => ['user' => $user]], Response::HTTP_CREATED);
 
         } catch (Exception $e) {
             return response()->json(['error' => $e->getMessage()], Response::HTTP_BAD_REQUEST);
