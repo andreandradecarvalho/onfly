@@ -24,6 +24,7 @@ Route::group([ 'prefix' => 'v1', 'as' => 'v1.'], function () {
             Route::post('refresh', [AuthController::class, 'refreshToken']);
             Route::post('logout', [AuthController::class, 'logout']);
             Route::get('user', [AuthController::class, 'getUser']);
+            Route::get('me', [AuthController::class, 'getUser']);
         });
     });
 });

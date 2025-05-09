@@ -22,9 +22,9 @@ const login = async () => {
     });
 
     auth.setAuth(response.data);
-    router.push('/');
+    router.push('/dashboard');
   } catch (err: any) {
-    error.value = err.response?.data?.message || 'An error occurred during login';
+    error.value = err.response?.data?.message || 'Ocorreu um erro ao tentar realizar o login';
   } finally {
     loading.value = false;
   }
@@ -35,12 +35,10 @@ const login = async () => {
   <div class="min-h-screen bg-gray-100 flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
     <div class="max-w-md w-full space-y-8 bg-white p-8 rounded-lg shadow-md">
       <div>
-        <h2 class="mt-6 text-center text-3xl font-extrabold text-gray-900">Sign in to your account</h2>
+        <h2 class="mt-6 text-center text-3xl font-extrabold text-gray-900">Entre na sua conta</h2>
         <p class="mt-2 text-center text-sm text-gray-600">
-          Or
-          <router-link to="/register" class="font-medium text-blue-600 hover:text-blue-500">
-            create a new account
-          </router-link>
+          ou
+          <router-link to="/" class="font-medium text-blue-600 hover:text-blue-500">voltar a home</router-link>
         </p>
       </div>
       <div v-if="error" class="rounded-md bg-red-50 p-4">
@@ -58,7 +56,7 @@ const login = async () => {
       <form class="mt-8 space-y-6" @submit.prevent="login">
         <div class="rounded-md shadow-sm space-y-4">
           <div>
-            <label for="email" class="block text-sm font-medium text-gray-700">Email address</label>
+            <label for="email" class="block text-sm font-medium text-gray-700">Qual é o seu email?</label>
             <input
               id="email"
               v-model="email"
@@ -68,7 +66,7 @@ const login = async () => {
             />
           </div>
           <div>
-            <label for="password" class="block text-sm font-medium text-gray-700">Password</label>
+            <label for="password" class="block text-sm font-medium text-gray-700">Qual é a senha?</label>
             <input
               id="password"
               v-model="password"
@@ -80,13 +78,9 @@ const login = async () => {
         </div>
 
         <div>
-          <button
-            type="submit"
-            :disabled="loading"
-            class="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50"
-          >
-            <span v-if="loading">Signing in...</span>
-            <span v-else>Sign in</span>
+          <button type="submit" :disabled="loading" class="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50">
+            <span v-if="loading">Logando...</span>
+            <span v-else>Logar</span>
           </button>
         </div>
       </form>

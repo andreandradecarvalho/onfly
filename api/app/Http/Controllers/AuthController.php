@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Service\AuthService;
 use App\Http\Requests\AuthRequest;
+use Request;
 
 class AuthController extends Controller
 
@@ -12,6 +13,10 @@ class AuthController extends Controller
 
     public function login(AuthRequest $authRequest, AuthService $authService){
        return $authService->login($authRequest);
+    }
+
+    public function getUser(){
+        return response()->json(auth()->user());
     }
 
     public function logout(){
