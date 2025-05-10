@@ -72,6 +72,18 @@ const router = createRouter({
       component: PessoaForm,
       meta: { requiresAuth: true },
     },
+    // Catch-all 404 route
+    {
+      path: '/:pathMatch(.*)*',
+      name: 'NotFound',
+      redirect: () => {
+        const auth = useAuth()
+        if (auth.isAuthenticated()) {
+          return { name: 'Dashboard' } // Redirect to Dashboard if logged in
+        }
+        return { name: 'Login' } // Redirect to Login if not logged in
+      },
+    },
   ],
 })
 

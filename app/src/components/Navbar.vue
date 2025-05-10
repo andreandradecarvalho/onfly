@@ -43,6 +43,7 @@ const logout = async () => {
         <div class="hidden md:flex items-center space-x-8">
           <router-link to="/login" class="text-gray-700 hover:text-blue-600" v-if="!auth.isAuthenticated()">Login</router-link>
           <router-link to="/register" class="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700" v-if="!auth.isAuthenticated()">Cadastrar</router-link>
+          <router-link to="/dashboard" class="text-gray-700 hover:text-blue-600" v-if="auth.isAuthenticated() && (auth.userData.value?.is_super_admin || auth.userData.value?.is_admin)">Dashboard</router-link>
           <button @click="logout" class="bg-red-600 text-white px-4 py-2 rounded-md hover:bg-red-700" v-if="auth.isAuthenticated()">Logout</button>
         </div>
 
@@ -61,9 +62,10 @@ const logout = async () => {
     <!-- Mobile Menu -->
     <div v-if="isMenuOpen" class="md:hidden">
       <div class="px-2 pt-2 pb-3 space-y-1">
-        <router-link to="/login" class="block px-3 py-2 text-gray-700 hover:text-blue-600" v-if="!auth.isAuthenticated()">Login</router-link>
-        <router-link to="/register" class="block px-3 py-2 text-gray-700 hover:text-blue-600" v-if="!auth.isAuthenticated()">Cadastrar</router-link>
-        <button @click="logout" class="bg-red-600 text-white px-4 py-2 rounded-md hover:bg-red-700" v-if="auth.isAuthenticated()">Logout</button>
+        <router-link to="/login" class="block py-2 px-4 text-sm text-gray-700 hover:bg-gray-200" v-if="!auth.isAuthenticated()">Login</router-link>
+        <router-link to="/register" class="block py-2 px-4 text-sm text-gray-700 hover:bg-gray-200" v-if="!auth.isAuthenticated()">Cadastrar</router-link>
+        <router-link to="/dashboard" class="block py-2 px-4 text-sm text-gray-700 hover:bg-gray-200" v-if="auth.isAuthenticated() && (auth.userData.value?.is_super_admin || auth.userData.value?.is_admin)">Dashboard</router-link>
+        <button @click="logout" class="w-full text-left block py-2 px-4 text-sm text-red-600 hover:bg-gray-200" v-if="auth.isAuthenticated()">Logout</button>
       </div>
     </div>
   </nav>
