@@ -35,7 +35,11 @@ Route::group([ 'prefix' => 'v1', 'as' => 'v1.'], function () {
     });
 
     /* COMPANIES */
-    Route::group(['prefix' => 'companies', 'as' => 'companies.', 'middleware' => ['api', CheckAuthorization::class]], function () {
-        Route::get('/', [CompanyController::class, 'index']);
-    });
+   Route::group(['prefix' => 'companies', 'as' => 'companies.', 'middleware' => ['api', CheckAuthorization::class]], function () {
+       Route::get('/', [CompanyController::class, 'index']);
+       Route::post('/', [CompanyController::class, 'store']); // Add this line
+       Route::get('/{id}', [CompanyController::class, 'show']);
+       Route::put('/{id}', [CompanyController::class, 'update']);
+       Route::delete('/{id}', [CompanyController::class, 'destroy']);
+   });
 });
