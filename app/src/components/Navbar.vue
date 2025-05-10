@@ -35,7 +35,8 @@ const logout = async () => {
     <div class="max-w-7xl mx-auto px-4">
       <div class="flex justify-between h-16">
         <div class="flex items-center">
-          <router-link to="/" class="text-2xl font-bold text-blue-600">Onfly</router-link>
+          <router-link to="/" v-if="!auth.isAuthenticated()" class="text-2xl font-bold text-blue-600">Onfly</router-link>
+          <router-link to="/dashboard" v-if="auth.isAuthenticated()" class="text-2xl font-bold text-blue-600">Onfly</router-link>
         </div>
 
         <!-- Desktop Menu -->

@@ -3,6 +3,10 @@ import HomeView from '../views/HomeView.vue'
 import Register from '../views/Register.vue'
 import Login from '../views/Login.vue'
 import Dashboard from '../views/Dashboard.vue'
+import EmpresasList from '../views/empresa/EmpresasList.vue'
+import EmpresaForm from '../views/empresa/EmpresaForm.vue'
+import PessoasList from '../views/PessoasList.vue'
+import PessoaForm from '../views/PessoaForm.vue'
 import { useAuth } from '../stores/auth'
 
 const router = createRouter({
@@ -30,6 +34,42 @@ const router = createRouter({
       path: '/dashboard',
       name: 'Dashboard',
       component: Dashboard,
+      meta: { requiresAuth: true },
+    },
+    {
+      path: '/empresas',
+      name: 'Empresas',
+      component: EmpresasList,
+      meta: { requiresAuth: true },
+    },
+    {
+      path: '/empresas/novo',
+      name: 'EmpresaNew',
+      component: EmpresaForm,
+      meta: { requiresAuth: true },
+    },
+    {
+      path: '/empresas/editar/:id',
+      name: 'EmpresaEdit',
+      component: EmpresaForm,
+      meta: { requiresAuth: true },
+    },
+    {
+      path: '/pessoas',
+      name: 'Pessoas',
+      component: PessoasList,
+      meta: { requiresAuth: true },
+    },
+    {
+      path: '/pessoas/novo',
+      name: 'PessoaNew',
+      component: PessoaForm,
+      meta: { requiresAuth: true },
+    },
+    {
+      path: '/pessoas/editar/:id',
+      name: 'PessoaEdit',
+      component: PessoaForm,
       meta: { requiresAuth: true },
     },
   ],
