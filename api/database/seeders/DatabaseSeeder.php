@@ -19,6 +19,7 @@ class DatabaseSeeder extends Seeder
             PositionCompanySeeder::class,
             InitialOnflySeeder::class,
             OnflyEmployeesSeeder::class,
+            CompanyAndEmployeeSeeder::class,
             FlightTicketsSeeder::class,
         ]);
     }

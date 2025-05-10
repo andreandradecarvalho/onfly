@@ -3,20 +3,31 @@
 namespace App\Http\Controllers;
 
 use App\Service\AuthService;
+use App\Service\UserService;
 use App\Http\Requests\AuthRequest;
 use Request;
 
 class AuthController extends Controller
 
 {
-    public function __construct() {}
+    private $userService;
+
+    public function __construct(UserService $userService) {
+        $this->userService = $userService;
+    }
 
     public function login(AuthRequest $authRequest, AuthService $authService){
        return $authService->login($authRequest);
     }
 
     public function getUser(){
-        return response()->json(auth()->user());
+        $userWithCompany = $this->userService->getUserWithCompany();
+        
+        if (!$userWithCompany) {
+            return response()->json(['message' => 'User not found'], 404);
+        }
+        
+        return response()->json($userWithCompany);
     }
 
     public function logout(){

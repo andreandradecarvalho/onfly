@@ -62,4 +62,40 @@ class User extends Authenticatable implements JWTSubject
     {
         return [];
     }
+
+    /**
+     * Get the companies associated with the user
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany
+     */
+    public function companies()
+    {
+        return $this->belongsToMany(Company::class, 'company_user', 'user_id', 'company_id');
+    }
+
+    /**
+     * Check if user has a specific role
+     *
+     * @param string $roleName
+     * @return bool
+     */
+    public function hasRole(string $roleName): bool
+    {
+        // Check roles based on new columns
+        return match($roleName) {
+            'super_admin' => $this->is_super_admin,
+            'admin' => $this->is_admin,
+            default => false
+        };
+    }
+
+    /**
+     * Check if user is a SuperAdmin
+     *
+     * @return bool
+     */
+    public function isSuperAdmin(): bool
+    {
+        return $this->is_super_admin === true;
+    }
 }

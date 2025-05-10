@@ -34,7 +34,6 @@ php artisan migrate:status || { echo "Migration verification failed"; exit 1; }
 
 echo "Running seeders..."
 php artisan db:seed --class=DatabaseSeeder --force || { echo "DatabaseSeeder failed"; exit 1; }
-php artisan db:seed --force || { echo "Seeder failed"; exit 1; }
 
 echo "Generating application key..."
 php artisan key:generate || { echo "Key generation failed"; exit 1; }

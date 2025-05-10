@@ -12,8 +12,10 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('users', function (Blueprint $table) {
-            $table->boolean('isSuperAdmin')->default(false);
-            $table->boolean('isAdmin')->default(false);
+            $table->boolean('is_super_admin')->default(false)
+            ->comment('Indicates if the user is a super administrator');
+            $table->boolean('is_admin')->default(false)
+            ->comment('Indicates if the user is a administrator');
         });
     }
 
@@ -23,7 +25,7 @@ return new class extends Migration
     public function down(): void
     {
         Schema::table('users', function (Blueprint $table) {
-            $table->dropColumn(['isSuperAdmin', 'isAdmin']);
+            $table->dropColumn(['is_super_admin', 'is_admin']);
         });
     }
 };

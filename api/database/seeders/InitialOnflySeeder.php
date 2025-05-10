@@ -31,11 +31,11 @@ class InitialOnflySeeder extends Seeder
 
         // Criar usuário
         DB::table('users')->insertOrIgnore([
-            'name' => 'Onfly',
+            'name' => 'Marcos',
             'email' => 'onfly@onfly.com.br',
             'password' => Hash::make('123456'),
-            'isSuperAdmin' => true,
-            'isAdmin' => true,
+            'is_super_admin' => true,
+            'is_admin' => true,
             'created_at' => now(),
             'updated_at' => now(),
         ]);
