@@ -5,8 +5,8 @@ import Login from '../views/Login.vue'
 import Dashboard from '../views/Dashboard.vue'
 import EmpresasList from '../views/empresa/EmpresasList.vue'
 import EmpresaForm from '../views/empresa/EmpresaForm.vue'
-import PessoasList from '../views/PessoasList.vue'
-import PessoaForm from '../views/PessoaForm.vue'
+import PessoasList from '../views/pessoa/PessoasList.vue'
+import PessoaForm from '../views/pessoa/PessoaForm.vue'
 import { useAuth } from '../stores/auth'
 
 const router = createRouter({

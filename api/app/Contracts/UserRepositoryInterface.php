@@ -6,7 +6,7 @@ use Illuminate\Http\Request;
 
 interface UserRepositoryInterface
 {
-    public function create(Request $request);
+    public function create(array $data);
     
     /**
      * Get authenticated user with company information
@@ -15,4 +15,8 @@ interface UserRepositoryInterface
      * @return mixed
      */
     public function getUserWithCompany(int $userId);
+
+    public function delete(int $userId): bool;
+
+    public function update(int $userId, array $data);
 }

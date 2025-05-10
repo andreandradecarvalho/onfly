@@ -6,7 +6,7 @@ use App\Http\Controllers\CompanyController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Middleware\CheckAuthorization;
-
+use App\Http\Controllers\UserController;
 
 
 Route::get('/healthcheck', function (Request $request) {
@@ -41,5 +41,14 @@ Route::group([ 'prefix' => 'v1', 'as' => 'v1.'], function () {
        Route::get('/{id}', [CompanyController::class, 'show']);
        Route::put('/{id}', [CompanyController::class, 'update']);
        Route::delete('/{id}', [CompanyController::class, 'destroy']);
+   });
+
+   /* USERS */
+   Route::group(['prefix' => 'users', 'as' => 'users.', 'middleware' => ['api', CheckAuthorization::class]], function () {
+       Route::get('/', [UserController::class, 'index']);
+       Route::post('/', [UserController::class, 'store']); // Add this line
+       Route::get('/{id}', [UserController::class, 'show']);
+       Route::put('/{id}', [UserController::class, 'update']);
+       Route::delete('/{id}', [UserController::class, 'destroy']);
    });
 });

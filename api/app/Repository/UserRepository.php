@@ -16,14 +16,27 @@ class UserRepository implements UserRepositoryInterface
         $this->user = $user;
     }
 
-    public function create(Request $request)
+    public function create(array $data)
     {
-        $user = new User();
-        $user->name = $request->input('name');
-        $user->email = $request->input('email');
-        $user->password = bcrypt($request->input('password'));
-        $user->save();
-        return $user;
+        $user = $this->user->create([
+            'name' => $data['name'],
+            'email' => $data['email'],
+            'password' => bcrypt($data['password']),
+            // Add other user fields if necessary
+            'is_admin' => $data['is_admin'] ?? false, // Default to false if not provided
+            'is_super_admin' => $data['is_super_admin'] ?? false, // Default to false if not provided
+        ]);
+
+        // Attach to company
+        if (!empty($data['company_id'])) {
+            $pivotData = [];
+            if (!empty($data['position_company_id'])) {
+                $pivotData['position_companies_id'] = $data['position_company_id'];
+            }
+            $user->companies()->attach($data['company_id'], $pivotData);
+        }
+
+        return $this->getUserWithCompany($user->id);
     }
 
     /**
@@ -38,7 +51,7 @@ class UserRepository implements UserRepositoryInterface
             ->join('company_user', 'users.id', '=', 'company_user.user_id')
             ->join('companies', 'company_user.company_id', '=', 'companies.id')
             ->leftJoin('position_companies', function($join) {
-                $join->on('company_user.id', '=', 'position_companies.id');
+                $join->on('company_user.position_companies_id', '=', 'position_companies.id');
             })
             ->select(
                 'users.*',
@@ -48,5 +61,89 @@ class UserRepository implements UserRepositoryInterface
                 'position_companies.id as position_id'
             )
             ->first();
+    }
+
+    public function getAllUsers()
+    {
+        return $this->user->all();
+    }
+
+    public function getUsersByCompanyId(int $companyId)
+    {
+        // This assumes you have a direct or indirect relationship
+        // between users and companies, for example, a company_id column on the users table
+        // or a pivot table. Adjust the query as per your actual database schema.
+        return $this->user->where('company_id', $companyId)->get();
+    }
+
+    public function getUserById(int $userId)
+    {
+        return $this->user->find($userId);
+    }
+
+    public function delete(int $userId): bool
+    {
+        $user = $this->user->find($userId);
+        if ($user) {
+            // Detach from companies to remove entries from company_user pivot table
+            $user->companies()->detach();
+            return $user->delete();
+        }
+        return false;
+    }
+
+    public function update(int $userId, array $data)
+    {
+        $user = $this->user->find($userId);
+        if (!$user) {
+            return null; // Or throw an exception
+        }
+
+        // Update user fields
+        if (isset($data['name'])) {
+            $user->name = $data['name'];
+        }
+        if (isset($data['email'])) {
+            $user->email = $data['email'];
+        }
+        if (!empty($data['password'])) {
+            $user->password = bcrypt($data['password']);
+        }
+        if (isset($data['is_admin'])) {
+            $user->is_admin = $data['is_admin'];
+        }
+        if (isset($data['is_super_admin'])) {
+            $user->is_super_admin = $data['is_super_admin'];
+        }
+
+        $user->save();
+
+        // Update company and position if company_id is provided
+        // This will detach existing company and attach the new one with the new position.
+        // If company_id is not provided, existing associations are maintained.
+        if (isset($data['company_id'])) {
+            $pivotData = [];
+            if (isset($data['position_company_id'])) {
+                $pivotData['position_companies_id'] = $data['position_company_id'];
+            } else {
+                // If position_company_id is not provided with a new company_id,
+                // you might want to set it to null or handle as per business logic.
+                // For now, we assume if a company changes, the position might change or be nullified.
+                $pivotData['position_companies_id'] = null;
+            }
+            // Sync will detach all existing companies and attach the new one(s).
+            // If you want to only add/update without detaching others, use updateExistingPivot or attach.
+            $user->companies()->sync([$data['company_id'] => $pivotData]);
+        } elseif (isset($data['position_company_id']) && $user->companies()->exists()) {
+            // If only position_company_id is provided, update it for the current company.
+            // This assumes a user is associated with at most one company for this logic to be simple.
+            // If a user can be in multiple companies, you'd need to specify which company's position to update.
+            $company = $user->companies()->first(); // Get the first associated company
+            if ($company) {
+                $user->companies()->updateExistingPivot($company->id, ['position_companies_id' => $data['position_company_id']]);
+            }
+        }
+
+        return $this->getUserWithCompany($user->id);
     }
 }
