@@ -45,12 +45,15 @@ done
 # Pausa pra criar suspense
 sleep 2
 
-# Revelando as URLs com estilo
-echo "🌟 Eis as URLs sagradas da sua aplicação, direto do caldeirão do localhost!"
+# Revelando as URLs e credenciais com estilo
+echo "🌟 Eis as URLs sagradas da sua aplicação e as credenciais, direto do caldeirão do localhost!"
 echo "---------------------------------------------------"
 echo "🖥️  API Laravel (o chefão do pedaço): http://127.0.0.1:8000"
 #echo "📊  Painel Horizon (pras filas mais organizadas): http://127.0.0.1:8000/horizon"
 echo "🎨  Frontend Vue.js (tá brilhando que nem purpurina): http://localhost:5173"
+echo "🔑  Credenciais de acesso:"
+echo "     Usuário: onfly@onfly.com.br"
+echo "     Senha: 123456"
 echo "---------------------------------------------------"
 echo "💡 Dica de mestre: Se der zica, veja se o .env tá brincando de esconde-esconde ou se o SQLSTATE[08006] tá de volta. 🕵️‍♂️"
 echo "🚀 Manda ver no código, você é o cara! 😎"

@@ -25,6 +25,17 @@ php artisan config:clear || { echo "Config clear failed"; exit 1; }
 # Run migrations and generate keys
 echo "Running migrations..."
 php artisan migrate --force || { echo "Migration failed"; exit 1; }
+
+# Wait a moment to ensure migrations are fully complete
+sleep 3
+
+echo "Verifying migrations..."
+php artisan migrate:status || { echo "Migration verification failed"; exit 1; }
+
+echo "Running seeders..."
+php artisan db:seed --class=DatabaseSeeder --force || { echo "DatabaseSeeder failed"; exit 1; }
+php artisan db:seed --force || { echo "Seeder failed"; exit 1; }
+
 echo "Generating application key..."
 php artisan key:generate || { echo "Key generation failed"; exit 1; }
 echo "Generating JWT secret..."
