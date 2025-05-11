@@ -1,13 +1,18 @@
 <?php
 
-namespace App\Service;
+namespace App\Services;
 
-use App\Contracts\AuthRepositoryInterface;
+use App\Repositories\Interfaces\AuthRepositoryInterface;
 
 
 class AuthService implements AuthRepositoryInterface
 {
-   public function __construct(){}
+   protected $userService;
+
+    public function __construct(UserService $userService)
+    {
+        $this->userService = $userService;
+    }
 
     public function login($request)
     {
@@ -27,8 +32,9 @@ class AuthService implements AuthRepositoryInterface
             'data' => [
                 'token' => $token,
                 'token_type' => 'bearer',
-                'expires_in' => auth()->factory()->getTTL() * 60],
-                'user' => ['id' => auth()->user()->id, 'name' => auth()->user()->name]
+                'expires_in' => auth()->factory()->getTTL() * 60,
+                'user' => $this->userService->getUserWithCompany(auth()->user()->id)
+            ]
         ]);
     }
 

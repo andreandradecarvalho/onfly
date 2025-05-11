@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\Service\UserService;
+use App\Services\UserService;
 use Illuminate\Http\Request;
 use App\Http\Requests\StoreUserRequest; // Add this line
 use App\Http\Requests\UpdateUserRequest;

@@ -4,7 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\UserRegistrationRequest;
 use App\Models\UserRegistration;
-use App\Repository\UserRepository;
+use App\Repositories\UserRepository;
 use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;

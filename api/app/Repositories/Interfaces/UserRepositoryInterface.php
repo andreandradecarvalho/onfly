@@ -1,16 +1,16 @@
 <?php
 
-namespace App\Contracts;
+namespace App\Repositories\Interfaces;
 
 use Illuminate\Http\Request;
 
 interface UserRepositoryInterface
 {
     public function create(array $data);
-    
+
     /**
      * Get authenticated user with company information
-     * 
+     *
      * @param int $userId
      * @return mixed
      */

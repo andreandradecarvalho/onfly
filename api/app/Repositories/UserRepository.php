@@ -1,11 +1,9 @@
 <?php
 
-namespace App\Repository;
+namespace App\Repositories;
 
-use App\Contracts\UserRepositoryInterface;
+use App\Repositories\Interfaces\UserRepositoryInterface;
 use App\Models\User;
-use Carbon\Carbon;
-use Illuminate\Http\Request;
 
 class UserRepository implements UserRepositoryInterface
 {
@@ -39,12 +37,6 @@ class UserRepository implements UserRepositoryInterface
         return $this->getUserWithCompany($user->id);
     }
 
-    /**
-     * Get authenticated user with company information
-     *
-     * @param int $userId
-     * @return mixed
-     */
     public function getUserWithCompany(int $userId)
     {
         return $this->user->where('users.id', $userId)
@@ -119,9 +111,6 @@ class UserRepository implements UserRepositoryInterface
 
     public function getUsersByCompanyId(int $companyId)
     {
-        // This assumes you have a direct or indirect relationship
-        // between users and companies, for example, a company_id column on the users table
-        // or a pivot table. Adjust the query as per your actual database schema.
         return $this->user->where('company_id', $companyId)->get();
     }
 
@@ -153,7 +142,7 @@ class UserRepository implements UserRepositoryInterface
     {
         $user = $this->user->find($userId);
         if ($user) {
-            // Detach from companies to remove entries from company_user pivot table
+            // Desvincula o usuário da empresa
             $user->companies()->detach();
             return $user->delete();
         }
@@ -164,10 +153,10 @@ class UserRepository implements UserRepositoryInterface
     {
         $user = $this->user->find($userId);
         if (!$user) {
-            return null; // Or throw an exception
+            return null;
         }
 
-        // Update user fields
+        // Atualiza os campos do usuário
         if (isset($data['name'])) {
             $user->name = $data['name'];
         }
@@ -186,27 +175,16 @@ class UserRepository implements UserRepositoryInterface
 
         $user->save();
 
-        // Update company and position if company_id is provided
-        // This will detach existing company and attach the new one with the new position.
-        // If company_id is not provided, existing associations are maintained.
         if (isset($data['company_id'])) {
             $pivotData = [];
             if (isset($data['position_company_id'])) {
                 $pivotData['position_companies_id'] = $data['position_company_id'];
             } else {
-                // If position_company_id is not provided with a new company_id,
-                // you might want to set it to null or handle as per business logic.
-                // For now, we assume if a company changes, the position might change or be nullified.
                 $pivotData['position_companies_id'] = null;
             }
-            // Sync will detach all existing companies and attach the new one(s).
-            // If you want to only add/update without detaching others, use updateExistingPivot or attach.
             $user->companies()->sync([$data['company_id'] => $pivotData]);
         } elseif (isset($data['position_company_id']) && $user->companies()->exists()) {
-            // If only position_company_id is provided, update it for the current company.
-            // This assumes a user is associated with at most one company for this logic to be simple.
-            // If a user can be in multiple companies, you'd need to specify which company's position to update.
-            $company = $user->companies()->first(); // Get the first associated company
+            $company = $user->companies()->first();
             if ($company) {
                 $user->companies()->updateExistingPivot($company->id, ['position_companies_id' => $data['position_company_id']]);
             }

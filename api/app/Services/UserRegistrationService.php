@@ -4,7 +4,7 @@ namespace Api\Service;
 
 use App\Http\Requests\UserRegistrationRequest;
 use App\Models\UserRegistration;
-use App\Repository\UserRepository;
+use App\Repositories\UserRepository;
 
 
 class UserRegistrationService

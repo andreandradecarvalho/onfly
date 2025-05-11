@@ -1,22 +1,22 @@
 <?php
 
-namespace App\Service;
+namespace App\Services;
 
 use Illuminate\Support\Facades\Auth;
-use App\Repository\UserRepository;
+use App\Repositories\UserRepository;
 
 class UserService
 {
-    private $userRepository;
+    private $repository;
 
     /**
      * UserService constructor
      *
      * @param UserRepository $userRepository
      */
-    public function __construct(UserRepository $userRepository)
+    public function __construct(UserRepository $repository)
     {
-        $this->userRepository = $userRepository;
+        $this->repository = $repository;
     }
 
     /**
@@ -32,7 +32,7 @@ class UserService
             return null;
         }
 
-        return $this->userRepository->getUserWithCompany($user->id);
+        return $this->repository->getUserWithCompany($user->id);
     }
 
     /**
@@ -49,7 +49,7 @@ class UserService
         // You might want to add more complex validation or business logic here,
         // e.g., check if company_id exists, check if position_id is valid for the company, etc.
 
-        return $this->userRepository->create($data);
+        return $this->repository->create($data);
     }
 
     /**
@@ -60,7 +60,7 @@ class UserService
      */
     public function getUserByIdWithCompany(int $userId)
     {
-        return $this->userRepository->getUserWithCompany($userId);
+        return $this->repository->getUserWithCompany($userId);
     }
 
     /**
@@ -72,7 +72,7 @@ class UserService
      */
     public function updateUser(int $userId, array $data)
     {
-        return $this->userRepository->update($userId, $data);
+        return $this->repository->update($userId, $data);
     }
 
     /**
@@ -83,7 +83,7 @@ class UserService
      */
     public function deleteUser(int $userId): bool
     {
-        return $this->userRepository->delete($userId);
+        return $this->repository->delete($userId);
     }
 
     /**
@@ -101,15 +101,15 @@ class UserService
         }
 
         if ($user->is_super_admin) {
-            return $this->userRepository->getAllUsers();
+            return $this->repository->getAllUsers();
         }
 
         if ($user->is_admin) {
-            return $this->userRepository->getUsersByCompanyId($user->company_id);
+            return $this->repository->getUsersByCompanyId($user->company_id);
         }
 
-        // Assuming getUserById also fetches company or you have a specific method for it
-        return $this->userRepository->getUserWithCompany($user->id);
+        // O getUserWithCompany traz a empresa
+        return $this->repository->getUserWithCompany($user->id);
 
     }
 
@@ -126,28 +126,13 @@ class UserService
             // Or handle as an error, depending on application flow
             return response()->json(['error' => 'Unauthorized'], 401);
         }
-
-        // If the current user is not an admin or super_admin, and no specific filters are applied that would grant them wider access,
-        // they should only see their own data. This also handles the case for regular users.
-        // However, the primary logic for filtering (including who can see what based on filters) is now in the repository.
-        // The service layer ensures the authenticated user context is passed.
-
-        // If specific filters are provided, pass them to the repository.
-        // If no filters are provided (e.g., a general /users call), the repository will use the $currentUser's role
-        // to determine the default scope (all for super_admin, company for admin, self for regular user - though self is handled if not admin/super_admin here).
-
-        // For a regular user (not admin, not super_admin) trying to list all users without specific admin/super_admin filters:
-        // This scenario should ideally not grant them a list of all users unless a specific filter allows it.
-        // The repository logic needs to be robust. For now, let's check if they are an admin or super_admin.
         if (!$currentUser->is_admin && !$currentUser->is_super_admin) {
-            // If query parameters for is_admin or is_super_admin are present, let the repository handle it.
-            // Otherwise, a regular user defaults to seeing only themselves.
-            if ($isSuperAdminFilter === null && $isAdminFilter === null) {
-                 return $this->userRepository->getUserWithCompany($currentUser->id);
+
+             if ($isSuperAdminFilter === null && $isAdminFilter === null) {
+                 return $this->repository->getUserWithCompany($currentUser->id);
             }
         }
 
-        // Admins, Super Admins, or calls with explicit role filters go to the repository's main listing method.
-        return $this->userRepository->getAllUsersWithCompany($isSuperAdminFilter, $isAdminFilter, $currentUser, $company_name);
+        return $this->repository->getAllUsersWithCompany($isSuperAdminFilter, $isAdminFilter, $currentUser, $company_name);
     }
 }

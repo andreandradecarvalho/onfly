@@ -2,10 +2,9 @@
 
 namespace App\Http\Controllers;
 
-use App\Service\AuthService;
-use App\Service\UserService;
+use App\Services\AuthService;
+use App\Services\UserService;
 use App\Http\Requests\AuthRequest;
-use Request;
 
 class AuthController extends Controller
 
@@ -22,11 +21,11 @@ class AuthController extends Controller
 
     public function getUser(){
         $userWithCompany = $this->userService->getUserWithCompany();
-        
+
         if (!$userWithCompany) {
             return response()->json(['message' => 'User not found'], 404);
         }
-        
+
         return response()->json($userWithCompany);
     }
 

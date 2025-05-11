@@ -57,18 +57,20 @@ class CompanyAndEmployeeSeeder extends Seeder
         foreach ($createdCompanies as $company) {
             for ($i = 1; $i <= 5; $i++) {
                 $email = Str::lower(Str::slug($company->name)) . ".employee{$i}@example.com";
-                $user = User::create([
-                    'name' => "Employee {$i} at {$company->name}",
-                    'email' => $email,
-                    'password' => Hash::make('123456'),
-                    'email_verified_at' => now(),
-                    'is_super_admin' => false,
-                    'is_admin' => false,
-                    'created_at' => now(),
-                ]);
+                $user = User::updateOrCreate(
+                    ['email' => $email],
+                    [
+                        'name' => "Employee {$i} at {$company->name}",
+                        'password' => Hash::make('123456'),
+                        'email_verified_at' => now(),
+                        'is_super_admin' => false,
+                        'is_admin' => false,
+                        'created_at' => now(),
+                    ]
+                );
 
                 // Adiciona usuário a empresa
-                $user->companies()->attach($company->id);
+                $user->companies()->syncWithoutDetaching([$company->id]);
             }
         }
 
@@ -83,35 +85,39 @@ class CompanyAndEmployeeSeeder extends Seeder
         // Cria um admin para cada empresa
         foreach ($createdCompanies as $company) {
             $adminEmail = Str::lower(Str::slug($company->name)) . ".superadmin@example.com";
-            $adminUser = User::create([
-                'name' => "Super Admin of {$company->name}",
-                'email' => $adminEmail,
-                'password' => Hash::make('123456'),
-                'email_verified_at' => now(),
-                'is_super_admin' => true,
-                'is_admin' => false,
-                'created_at' => now(),
-            ]);
+            $adminUser = User::updateOrCreate(
+                ['email' => $adminEmail],
+                [
+                    'name' => "Super Admin of {$company->name}",
+                    'password' => Hash::make('123456'),
+                    'email_verified_at' => now(),
+                    'is_super_admin' => true,
+                    'is_admin' => false,
+                    'created_at' => now(),
+                ]
+            );
 
             // Adiciona admin a empresa
-            $adminUser->companies()->attach($company->id);
+            $adminUser->companies()->syncWithoutDetaching([$company->id]);
         }
 
         // Cria um admin para cada empresa
         foreach ($createdCompanies as $company) {
             $adminEmail = Str::lower(Str::slug($company->name)) . ".admin@example.com";
-            $adminUser = User::create([
-                'name' => "Admin of {$company->name}",
-                'email' => $adminEmail,
-                'password' => Hash::make('123456'),
-                'email_verified_at' => now(),
-                'is_super_admin' => false,
-                'is_admin' => true,
-                'created_at' => now(),
-            ]);
+            $adminUser = User::updateOrCreate(
+                ['email' => $adminEmail],
+                [
+                    'name' => "Admin of {$company->name}",
+                    'password' => Hash::make('123456'),
+                    'email_verified_at' => now(),
+                    'is_super_admin' => false,
+                    'is_admin' => true,
+                    'created_at' => now(),
+                ]
+            );
 
             // Adiciona admin a empresa
-            $adminUser->companies()->attach($company->id);
+            $adminUser->companies()->syncWithoutDetaching([$company->id]);
         }
     }
 }
