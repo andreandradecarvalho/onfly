@@ -1,11 +1,21 @@
 <script setup lang="ts">
-import { defineProps, defineEmits } from 'vue';
+import { defineProps, defineEmits, ref } from 'vue';
+import EditFlightTicketModal from './EditFlightTicketModal.vue';
 
 // Inclua todos os eventos necessários aqui:
 const emit = defineEmits(['edit-request', 'confirm-update-status']);
 
+const isEditModalOpen = ref(false);
+const selectedRequest = ref<TravelRequest | null>(null);
+
 function editRequest(request: TravelRequest) {
-  emit('edit-request', request);
+  selectedRequest.value = { ...request };
+  isEditModalOpen.value = true;
+}
+
+function handleEditSave(updatedRequest: TravelRequest) {
+  emit('edit-request', updatedRequest);
+  isEditModalOpen.value = false;
 }
 
 interface TravelRequest {
@@ -152,4 +162,10 @@ const confirmAction = (id: number, status: 'aprovado' | 'cancelado') => {
       <p class="text-gray-500">Nenhuma solicitação de viagem encontrada.</p>
     </div>
   </div>
+    <EditFlightTicketModal
+      :open="isEditModalOpen"
+      :request="selectedRequest"
+      @close="isEditModalOpen = false"
+      @save="handleEditSave"
+    />
 </template>

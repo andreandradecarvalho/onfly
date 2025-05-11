@@ -90,7 +90,6 @@ const travelRequest = ref<TravelRequest>({
   returnDate: '',
   travelerId: '',
   passengers: 1,
-
 })
 
 const errors = ref<{ [key: string]: string }>({})
@@ -124,7 +123,6 @@ const validateForm = (): boolean => {
   }
 
   if (travelRequest.value.passengers < 1) {
-
   }
 
   return Object.keys(errors.value).length === 0
@@ -163,33 +161,6 @@ const submitTravelRequest = async () => {
       }, 3000) // 3 seconds delay
     } catch (error: any) {
       console.error('Erro detalhado ao criar solicitação de viagem:', error)
-      if (axios.isAxiosError(error)) {
-        if (error.response) {
-          const apiErrorMessage =
-            error.response.data?.message ||
-            error.response.data?.error ||
-            (typeof error.response.data === 'string'
-              ? error.response.data
-              : JSON.stringify(error.response.data))
-          errors.value.submit = `Erro da API (${error.response.status}): ${apiErrorMessage}.`
-          console.error('Detalhes do erro da API:', {
-            status: error.response.status,
-            data: error.response.data,
-            headers: error.response.headers,
-          })
-        } else if (error.request) {
-          errors.value.submit =
-            'Não foi possível conectar ao servidor. Verifique sua conexão e tente novamente.'
-          console.error('Erro de requisição (sem resposta do servidor):', error.request)
-        } else {
-          errors.value.submit = `Erro ao configurar a requisição para a API: ${error.message}`
-          console.error('Erro de configuração da requisição Axios:', error.message)
-        }
-      } else if (error instanceof Error) {
-        errors.value.submit = `Erro inesperado ao enviar solicitação: ${error.message}`
-      } else {
-        errors.value.submit = 'Ocorreu um erro desconhecido ao processar sua solicitação.'
-      }
     }
   }
 }
@@ -311,11 +282,7 @@ const submitTravelRequest = async () => {
               {{ errors.travelerId }}
             </p>
           </div>
-
-
         </div>
-
-
 
         <!-- Submission Error Message -->
         <p v-if="errors.submit" class="text-red-500 text-sm mt-2 mb-4">
