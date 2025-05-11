@@ -15,48 +15,48 @@ class FlightTicketsSeeder extends Seeder
     public function run(): void
     {
         $faker = Faker::create('pt_BR');
-        
-        // Get all user IDs
+
+        // Retorna todo os IDS de usuarios
         $userIds = DB::table('users')->pluck('id')->toArray();
-        
-        // Brazilian cities for origin and destination
+
+        // Cidades brasileiras para origem e destino
         $cities = [
-            'São Paulo', 'Rio de Janeiro', 'Belo Horizonte', 'Brasília', 
-            'Salvador', 'Curitiba', 'Fortaleza', 'Recife', 'Porto Alegre', 
+            'São Paulo', 'Rio de Janeiro', 'Belo Horizonte', 'Brasília',
+            'Salvador', 'Curitiba', 'Fortaleza', 'Recife', 'Porto Alegre',
             'Manaus', 'Belém', 'Goiânia', 'Campinas', 'São Luís'
         ];
 
         // Statuses
         $statuses = ['solicitado', 'aprovado', 'cancelado'];
 
-        // Create 7 flight tickets
+        // Cria 7 bilhetes de voos
         for ($i = 0; $i < 7; $i++) {
-            // Randomly select users for ticket
+            // Seleciona aleatoriamente usuarios para o bilhete
             $userId = $userIds[array_rand($userIds)];
             $requesterId = $userIds[array_rand($userIds)];
 
-            // Ensure requester and user are different
+            // Garante que o solicitante e o usuario sejam diferentes
             while ($userId === $requesterId) {
                 $requesterId = $userIds[array_rand($userIds)];
             }
 
-            // Generate unique order ID
+            // Gera um ID de pedido unico
             $orderId = 'FT-' . strtoupper(substr(uniqid(), -6));
 
-            // Randomly select origin and destination
+            // Seleciona aleatoriamente origem e destino
             $origin = $cities[array_rand($cities)];
             $destination = $cities[array_rand($cities)];
 
-            // Ensure origin and destination are different
+            // Garante que a origem e o destino sejam diferentes
             while ($origin === $destination) {
                 $destination = $cities[array_rand($cities)];
             }
 
-            // Generate dates
+            // Gera datas
             $departureDate = $faker->dateTimeBetween('+1 month', '+6 months');
             $returnDate = $faker->boolean(60) ? $faker->dateTimeBetween($departureDate, $departureDate->modify('+2 weeks')) : null;
 
-            // Insert flight ticket
+            // Insere o bilhete de voo
             DB::table('flight_tickets')->insert([
                 'order_id' => $orderId,
                 'user_id' => $userId,

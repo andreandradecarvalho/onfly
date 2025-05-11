@@ -42,48 +42,44 @@ class OnflyEmployeesSeeder extends Seeder
     {
         $faker = Faker::create('pt_BR');
 
-        // Get all position IDs
+        // Retorna todos os IDs de cargos
         $positionIds = DB::table('position_companies')->pluck('id')->toArray();
 
-        // Get Onfly company ID
-        $onflyCompanyId = DB::table('companies')->where('name', 'Onfly')->value('id');
+        // Retorna o ID da empresa Onfly
+        $onflyCompanyId = DB::table('companies')->where('name', 'Onfly - Viagens corporativas')->value('id');
 
-        if (!$onflyCompanyId) {
-            // Create Onfly company if it doesn't exist
-            $onflyCompanyId = DB::table('companies')->insertGetId([
-                'name' => 'Onfly',
-                'created_at' => now(),
-                'updated_at' => now()
-            ]);
-        }
+        if ($onflyCompanyId) {
+                // Cria 5 funcionários
+                $employees = [];
+                for ($i = 0; $i < 5; $i++) {
+                    $firstName = $this->removeSpecialChars($faker->firstName);
+                    $lastName = $this->removeSpecialChars($faker->lastName);
 
-        // Create 10 employees
-        $employees = [];
-        for ($i = 0; $i < 10; $i++) {
-            $firstName = $this->removeSpecialChars($faker->firstName);
-            $lastName = $this->removeSpecialChars($faker->lastName);
+                // Cria usuário
+                $userId = DB::table('users')->insertGetId([
+                    'name' => $firstName . ' ' . $lastName,
+                    'email' => strtolower($firstName . '.' . $lastName . '@onfly.com.br'),
+                    'password' => bcrypt('123456'),
+                    'email_verified_at' => now(),
+                    'is_super_admin' => false,
+                    'is_admin' => (($i == 1) ? true : false),
+                    'created_at' => now(),
+                    'updated_at' => now()
+                ]);
 
-            // Create user
-            $userId = DB::table('users')->insertGetId([
-                'name' => $firstName . ' ' . $lastName,
-                'email' => strtolower($firstName . '.' . $lastName . '@onfly.com.br'),
-                'password' => bcrypt('123456'), // Temporary password
-                'created_at' => now(),
-                'updated_at' => now()
-            ]);
+                // Seleciona aleatoriamente um cargo
+                $positionId = $positionIds[array_rand($positionIds)];
 
-            // Randomly select a position
-            $positionId = $positionIds[array_rand($positionIds)];
-
-            // Link user to company
-            DB::table('company_user')->insert([
-                'user_id' => $userId,
-                'company_id' => $onflyCompanyId,
-                'position_companies_id' => $positionId,
-                'is_primary' => $i === 0, // First employee is primary
-                'created_at' => now(),
-                'updated_at' => now()
-            ]);
+                // Vincula usuário à empresa
+                DB::table('company_user')->insert([
+                    'user_id' => $userId,
+                    'company_id' => $onflyCompanyId,
+                    'position_companies_id' => $positionId,
+                    'is_primary' => $i === 0, // Primeiro funcionário é primário
+                    'created_at' => now(),
+                    'updated_at' => now()
+                ]);
+            }
         }
     }
 }

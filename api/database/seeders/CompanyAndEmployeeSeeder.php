@@ -15,22 +15,8 @@ class CompanyAndEmployeeSeeder extends Seeder
      */
     public function run(): void
     {
-        // Define company data
+        // Cria empresas
         $companies = [
-            [
-                'name' => 'Tech Innovations',
-                'document' => '23.456.789/0001-81',
-                'address' => 'Av. Inovação, 456 - Rio de Janeiro, RJ',
-                'email' => 'contato@techinnovations.com.br',
-                'responsibility' => 'Maria Oliveira Costa'
-            ],
-            [
-                'name' => 'Digital Solutions',
-                'document' => '34.567.890/0001-72',
-                'address' => 'Rua da Transformação, 789 - Belo Horizonte, MG',
-                'email' => 'contato@digitalsolutions.com.br',
-                'responsibility' => 'Pedro Henrique Almeida'
-            ],
             [
                 'name' => 'Global Systems',
                 'document' => '45.678.901/0001-63',
@@ -47,63 +33,84 @@ class CompanyAndEmployeeSeeder extends Seeder
             ]
         ];
 
-        // Delete existing companies with the same documents
+        // Deleta empresas existentes com os mesmos documentos
         foreach ($companies as $companyData) {
             Company::where('document', $companyData['document'])->delete();
         }
 
-        // Create companies
+        // Cria empresas
         $createdCompanies = [];
         foreach ($companies as $companyData) {
             $company = Company::create($companyData);
             $createdCompanies[] = $company;
         }
 
-        // Delete existing users with the same email pattern
+        // Deleta funcionários existentes com o mesmo padrão de email
         foreach ($createdCompanies as $company) {
-            for ($i = 1; $i <= 4; $i++) {
+            for ($i = 1; $i <= 5; $i++) {
                 $email = Str::lower(Str::slug($company->name)) . ".employee{$i}@example.com";
                 User::where('email', $email)->delete();
             }
         }
 
-        // Create employees for each company
+        // Cria funcionários para cada empresa
         foreach ($createdCompanies as $company) {
-            for ($i = 1; $i <= 4; $i++) {
+            for ($i = 1; $i <= 5; $i++) {
                 $email = Str::lower(Str::slug($company->name)) . ".employee{$i}@example.com";
                 $user = User::create([
                     'name' => "Employee {$i} at {$company->name}",
                     'email' => $email,
-                    'password' => Hash::make('password123'),
+                    'password' => Hash::make('123456'),
                     'email_verified_at' => now(),
                     'is_super_admin' => false,
                     'is_admin' => false,
+                    'created_at' => now(),
                 ]);
 
-                // Attach user to company
+                // Adiciona usuário a empresa
                 $user->companies()->attach($company->id);
             }
         }
 
-        // Delete existing admin users with the same email pattern
+        // Deleta admin existentes com o mesmo padrão de email
         foreach ($createdCompanies as $company) {
             $adminEmail = Str::lower(Str::slug($company->name)) . ".admin@example.com";
             User::where('email', $adminEmail)->delete();
         }
 
-        // Create a company admin for each company
+
+
+        // Cria um admin para cada empresa
+        foreach ($createdCompanies as $company) {
+            $adminEmail = Str::lower(Str::slug($company->name)) . ".superadmin@example.com";
+            $adminUser = User::create([
+                'name' => "Super Admin of {$company->name}",
+                'email' => $adminEmail,
+                'password' => Hash::make('123456'),
+                'email_verified_at' => now(),
+                'is_super_admin' => true,
+                'is_admin' => false,
+                'created_at' => now(),
+            ]);
+
+            // Adiciona admin a empresa
+            $adminUser->companies()->attach($company->id);
+        }
+
+        // Cria um admin para cada empresa
         foreach ($createdCompanies as $company) {
             $adminEmail = Str::lower(Str::slug($company->name)) . ".admin@example.com";
             $adminUser = User::create([
                 'name' => "Admin of {$company->name}",
                 'email' => $adminEmail,
-                'password' => Hash::make('admin123'),
+                'password' => Hash::make('123456'),
                 'email_verified_at' => now(),
                 'is_super_admin' => false,
                 'is_admin' => true,
+                'created_at' => now(),
             ]);
 
-            // Attach admin user to company
+            // Adiciona admin a empresa
             $adminUser->companies()->attach($company->id);
         }
     }

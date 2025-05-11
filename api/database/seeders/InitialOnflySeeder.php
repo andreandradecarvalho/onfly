@@ -15,7 +15,7 @@ class InitialOnflySeeder extends Seeder
     {
         // Criar empresa
         DB::table('companies')->insertOrIgnore([
-            'name' => 'Onfly',
+            'name' => 'Onfly - Viagens corporativas',
             'document' => '30342266000183',
             'address' => 'Rua Maranhão, 339 – 2º andar, Santa Efigênia, Belo Horizonte – MG',
             'email' => 'onfly@onfly.com.br',
@@ -26,7 +26,7 @@ class InitialOnflySeeder extends Seeder
 
         // Recuperar o ID da empresa
         $onflyCompanyId = DB::table('companies')
-            ->where('name', 'Onfly')
+            ->where('name', 'Onfly - Viagens corporativas')
             ->value('id');
 
         // Criar usuário
