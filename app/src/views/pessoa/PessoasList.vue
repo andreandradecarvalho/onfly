@@ -1,9 +1,10 @@
 <script setup lang="ts">
-import { ref, onMounted } from 'vue' // Added onMounted
+import { ref, onMounted, watch } from 'vue' // Added onMounted and watch
 import { useRouter } from 'vue-router'
 import { useAuth } from '@/stores/auth'
 import Navbar from '@/components/Navbar.vue'
 import Footer from '@/components/Footer.vue'
+import axios from 'axios'
 
 // import axios from 'axios' // Uncomment if you implement API calls
 
@@ -35,35 +36,41 @@ interface Pessoa {
 
 const pessoas = ref<Pessoa[]>([])
 
+// Estados para os filtros
+const filtroEmpresa = ref('')
+const filtroTipo = ref({
+  superAdmin: false,
+  admin: false,
+})
+
 // Mock data fetching function (replace with actual API call)
 const fetchPessoas = async () => {
   loading.value = true
   error.value = null
   try {
-    // Simulate API call delay
-    await new Promise((resolve) => setTimeout(resolve, 500))
     // Replace with actual API call: e.g., await axios.get(...)
-    pessoas.value = [
-      {
-        id: 1,
-        nome: 'João Silva',
-        email: 'joao.silva@exemplo.com',
-        empresa: 'Empresa Exemplo 1',
-        cargo: 'Gerente',
+    const params: Record<string, any> = {}
+    if (filtroEmpresa.value) {
+      params.company_name = filtroEmpresa.value
+    }
+    if (filtroTipo.value.superAdmin) {
+      params.is_super_admin = true
+    }
+    if (filtroTipo.value.admin) {
+      params.is_admin = true
+    }
+
+    const response = await axios.get(`${import.meta.env.VITE_API_URL}/users`, {
+      params, // Adiciona os parâmetros de filtro na requisição
+      headers: {
+        Accept: 'application/json',
+        Authorization: `Bearer ${auth.token.value}`,
       },
-      {
-        id: 2,
-        nome: 'Maria Souza',
-        email: 'maria.souza@exemplo.com',
-        empresa: 'Empresa Exemplo 2',
-        cargo: 'Analista',
-      },
-    ]
+    })
+    pessoas.value = response.data
   } catch (err: unknown) {
     const errorMessage = err instanceof Error ? err.message : 'Erro ao carregar pessoas'
     error.value = errorMessage
-    // For actual API calls, you might use similar error handling as in EmpresasList.vue:
-    // error.value = (err as { response?: { data?: { message?: string } } })?.response?.data?.message || errorMessage
   } finally {
     loading.value = false
   }
@@ -75,6 +82,9 @@ onMounted(async () => {
     await fetchPessoas()
   }
 })
+
+// Watchers para aplicar os filtros automaticamente
+watch([filtroEmpresa, filtroTipo], fetchPessoas, { deep: true })
 
 const editPessoa = (pessoa: Pessoa) => {
   router.push({ name: 'PessoaEdit', params: { id: pessoa.id.toString() } })
@@ -101,10 +111,12 @@ const confirmDeletePessoa = async () => {
   loading.value = true // Or a specific deleting state
   error.value = null
   try {
-    // TODO: Implement actual delete API call here
-    // await axios.delete(`${import.meta.env.VITE_API_URL}/pessoas/${pessoaIdToDelete.value}`, { headers: { Authorization: `Bearer ${auth.token.value}` } })
-    console.log(`Simulating delete for pessoa ID: ${pessoaIdToDelete.value}`)
-    await new Promise((resolve) => setTimeout(resolve, 500)) // Simulate API call
+    await axios.delete(`${import.meta.env.VITE_API_URL}/users/${pessoaIdToDelete.value}`, {
+      headers: {
+        Accept: 'application/json',
+        Authorization: `Bearer ${auth.token.value}`,
+      },
+    })
     pessoas.value = pessoas.value.filter((pessoa) => pessoa.id !== pessoaIdToDelete.value)
     // Optionally, re-fetch or show a success message
   } catch (err: unknown) {
@@ -131,6 +143,47 @@ const confirmDeletePessoa = async () => {
         >
           Nova Pessoa
         </button>
+      </div>
+      <div class="bg-white shadow-md rounded-lg p-6 mb-6">
+        <h2 class="text-2xl font-semibold text-gray-800 mb-4">Filtros</h2>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div>
+            <label for="filtroEmpresa" class="block text-sm font-medium text-gray-700 mb-1"
+              >Pessoa ou Empresa</label
+            >
+            <input
+              v-model="filtroEmpresa"
+              @input="realizarBusca"
+              id="filtroEmpresa"
+              type="text"
+              placeholder="Nome da pessoa ou empresa"
+              class="w-full border rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            />
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">Tipo de Usuário</label>
+            <div class="flex items-center space-x-4 mt-2 pt-1">
+              <label class="flex items-center space-x-2">
+                <input
+                  v-model="filtroTipo.superAdmin"
+                  type="checkbox"
+                  class="form-checkbox h-5 w-5 text-indigo-600 rounded focus:ring-indigo-500 border-gray-300"
+                />
+                <span class="text-sm text-gray-700">Super Admin</span>
+              </label>
+              <label class="flex items-center space-x-2">
+                <input
+                  v-model="filtroTipo.admin"
+                  type="checkbox"
+                  class="form-checkbox h-5 w-5 text-indigo-600 rounded focus:ring-indigo-500 border-gray-300"
+                />
+                <span class="text-sm text-gray-700">Admin</span>
+              </label>
+            </div>
+          </div>
+          <!-- Espaço reservado para um terceiro filtro, se necessário -->
+          <div></div>
+        </div>
       </div>
 
       <div class="bg-white shadow overflow-auto sm:rounded-lg">
@@ -162,6 +215,11 @@ const confirmDeletePessoa = async () => {
               <th
                 class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
               >
+                Tipo
+              </th>
+              <th
+                class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+              >
                 Cargo
               </th>
               <th
@@ -176,13 +234,75 @@ const confirmDeletePessoa = async () => {
               <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
                 {{ pessoa.id }}
               </td>
-              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ pessoa.nome }}</td>
+              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ pessoa.name }}</td>
               <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ pessoa.email }}</td>
               <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                {{ pessoa.empresa || 'N/A' }}
+                {{ pessoa.company_name || 'N/A' }}
+              </td>
+              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 flex items-center gap-2">
+                <span v-if="pessoa.is_super_admin" title="Super Admin" class="flex items-center">
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    class="h-5 w-5 text-yellow-500 mr-1"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                  >
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      stroke-width="2"
+                      d="M12 3l2.09 6.26L21 9.27l-5 4.87L17.18 21 12 17.77 6.82 21 8 14.14l-5-4.87 6.91-1.01z"
+                    />
+                  </svg>
+                  Super Admin
+                </span>
+                <span v-else-if="pessoa.is_admin" title="Admin" class="flex items-center">
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    class="h-5 w-5 text-blue-500 mr-1"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                  >
+                    <circle
+                      cx="12"
+                      cy="12"
+                      r="10"
+                      stroke="currentColor"
+                      stroke-width="2"
+                      fill="currentColor"
+                      class="text-blue-200"
+                    />
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      stroke-width="2"
+                      d="M12 8v4l3 3"
+                    />
+                  </svg>
+                  Admin
+                </span>
+                <span v-else title="Usuário" class="flex items-center">
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    class="h-5 w-5 text-gray-400 mr-1"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                  >
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      stroke-width="2"
+                      d="M5.121 17.804A13.937 13.937 0 0112 15c2.5 0 4.847.655 6.879 1.804M15 11a3 3 0 11-6 0 3 3 0 016 0z"
+                    />
+                  </svg>
+                  Usuário
+                </span>
               </td>
               <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                {{ pessoa.cargo || 'N/A' }}
+                {{ pessoa.position_name || 'N/A' }}
               </td>
               <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium space-x-2">
                 <button @click="editPessoa(pessoa)" class="text-indigo-600 hover:text-indigo-900">

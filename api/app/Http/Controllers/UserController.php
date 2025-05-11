@@ -19,10 +19,14 @@ class UserController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
+        $isSuperAdmin = $request->query('is_super_admin');
+        $isAdmin = $request->query('is_admin');
+        $company_name = $request->query('company_name');
+
         // Utilize the new method in UserService
-        return $this->userService->getUsersList();
+        return $this->userService->getAllUsersWithCompanyData($isSuperAdmin, $isAdmin,  $company_name);
     }
 
     /**

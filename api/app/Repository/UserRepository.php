@@ -68,12 +68,80 @@ class UserRepository implements UserRepositoryInterface
         return $this->user->all();
     }
 
+    public function getAllUsersWithCompany($isSuperAdminFilter = null, $isAdminFilter = null, $requestingUser = null,  $company_name =null)
+    {
+                $query = $this->user
+            ->join('company_user', 'users.id', '=', 'company_user.user_id')
+            ->join('companies', 'company_user.company_id', '=', 'companies.id')
+            ->leftJoin('position_companies', function($join) {
+                $join->on('company_user.position_companies_id', '=', 'position_companies.id');
+            });
+
+        // Apply filters based on query parameters
+        $isQueryingForGlobalSuperAdmins = false;
+        if ($isSuperAdminFilter !== null) {
+            $isSuperAdminFilterBool = filter_var($isSuperAdminFilter, FILTER_VALIDATE_BOOLEAN);
+            $query->where('users.is_super_admin', $isSuperAdminFilterBool);
+            if ($isSuperAdminFilterBool) {
+                $isQueryingForGlobalSuperAdmins = true; // User is specifically asking for super_admins globally
+            }
+        }
+        if ($isAdminFilter !== null) {
+            $query->where('users.is_admin', filter_var($isAdminFilter, FILTER_VALIDATE_BOOLEAN));
+        }
+
+        if ($company_name !== null) {
+            $query->where(function ($subQuery) use ($company_name) {
+                $subQuery->whereRaw('companies.name ILIKE ?', ['%' . $company_name . '%'])
+                         ->orWhereRaw('users.name ILIKE ?', ['%' . $company_name . '%']);
+            });
+        }
+
+        // Company scoping for non-super-admins:
+        // If a requestingUser is provided, and they are an admin but NOT a super_admin,
+        // AND we are NOT specifically querying for super_admins globally (who are outside company scope for this purpose),
+        // then scope the query to their company.
+        if ($requestingUser && $requestingUser->is_admin && !$requestingUser->is_super_admin) {
+            if (!$isQueryingForGlobalSuperAdmins) {
+                 $query->where('company_user.company_id', $requestingUser->company_id);
+            }
+        }
+
+        return $query->select(
+                'users.*',
+                'companies.name as company_name',
+                'companies.id as company_id',
+                'position_companies.name as position_name',
+                'position_companies.id as position_id'
+            )
+            ->get();
+    }
+
     public function getUsersByCompanyId(int $companyId)
     {
         // This assumes you have a direct or indirect relationship
         // between users and companies, for example, a company_id column on the users table
         // or a pivot table. Adjust the query as per your actual database schema.
         return $this->user->where('company_id', $companyId)->get();
+    }
+
+    public function getUsersByCompanyIdWithCompany(int $companyId)
+    {
+        return $this->user
+            ->join('company_user', 'users.id', '=', 'company_user.user_id')
+            ->join('companies', 'company_user.company_id', '=', 'companies.id')
+            ->leftJoin('position_companies', function($join) {
+                $join->on('company_user.position_companies_id', '=', 'position_companies.id');
+            })
+            ->where('companies.id', $companyId)
+            ->select(
+                'users.*',
+                'companies.name as company_name',
+                'companies.id as company_id',
+                'position_companies.name as position_name',
+                'position_companies.id as position_id'
+            )
+            ->get();
     }
 
     public function getUserById(int $userId)

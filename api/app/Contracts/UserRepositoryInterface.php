@@ -16,6 +16,10 @@ interface UserRepositoryInterface
      */
     public function getUserWithCompany(int $userId);
 
+    public function getAllUsersWithCompany($isSuperAdminFilter = null, $isAdminFilter = null, $requestingUser = null);
+
+    public function getUsersByCompanyIdWithCompany(int $companyId);
+
     public function delete(int $userId): bool;
 
     public function update(int $userId, array $data);
