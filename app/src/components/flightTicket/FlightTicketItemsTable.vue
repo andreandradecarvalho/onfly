@@ -31,13 +31,7 @@ interface TravelRequest {
   returnDate: string
   status: string
   createdAt: string
-  isCancellable?: boolean // Added to reflect parent data
   user_id: number // Campo obrigatório para bloqueio de aprovação/edição
-}
-
-type StatusUpdatePayload = {
-  id: number
-  status: 'aprovado' | 'cancelado'
 }
 
 const auth = useAuth()
@@ -58,9 +52,34 @@ const formatDate = (dateString: string) => {
   }).format(date)
 }
 
-function debugUserId(requestUserId: number, authUserId: number) {
-  console.log('[DEBUG] request.user_id:', requestUserId, '| authUserId:', authUserId)
-  return true // para não afetar o v-if
+function isRequestCancellable(request: TravelRequest): boolean {
+  if (request.status !== 'solicitado' || !request.departureDate) {
+    return false;
+  }
+
+  try {
+    const departure = new Date(request.departureDate);
+    // Ensure departure date is valid
+    if (isNaN(departure.getTime())) {
+        console.error('Invalid departure date:', request.departureDate);
+        return false;
+    }
+
+    // Important: Clear the time part for accurate date comparison
+    departure.setHours(0, 0, 0, 0);
+
+    const today = new Date();
+    today.setHours(0, 0, 0, 0); // Clear time part of today's date
+
+    const fiveDaysInMillis = 5 * 24 * 60 * 60 * 1000;
+    const diffInMillis = departure.getTime() - today.getTime();
+
+    // Allow cancellation only if departure is more than 5 days in the future
+    return diffInMillis > fiveDaysInMillis;
+  } catch (error) {
+    console.error("Error calculating date difference:", error);
+    return false;
+  }
 }
 
 const confirmAction = (id: number, status: 'aprovado' | 'cancelado') => {
@@ -197,7 +216,7 @@ const confirmAction = (id: number, status: 'aprovado' | 'cancelado') => {
             <div class="flex items-center space-x-2">
               <div v-if="canUpdateStatus && request.status !== 'cancelado'" class="flex space-x-4">
                 <button
-                  v-if="request.user_id !== authUserId"
+                  v-if="request.user_id !== authUserId && request.status !== 'aprovado'"
                   @click="editRequest(request)"
                   class="text-blue-600 hover:text-blue-800 transition-colors mr-2"
                   title="Editar"
@@ -218,7 +237,11 @@ const confirmAction = (id: number, status: 'aprovado' | 'cancelado') => {
                   </svg>
                 </button>
                 <button
-                  v-if="debugUserId(request.user_id, authUserId) && request.user_id !== authUserId"
+                  v-if="
+                    request.user_id !== authUserId &&
+                    request.status !== 'aprovado' &&
+                    request.status !== 'cancelado'
+                  "
                   @click="confirmAction(request.id, 'aprovado')"
                   class="text-green-600 hover:text-green-800 transition-colors"
                   title="Aprovar"
@@ -239,10 +262,11 @@ const confirmAction = (id: number, status: 'aprovado' | 'cancelado') => {
                   </svg>
                 </button>
                 <button
+                  v-if="isRequestCancellable(request) && request.user_id !== authUserId"
                   @click="confirmAction(request.id, 'cancelado')"
                   class="text-red-600 hover:text-red-800 transition-colors"
-                  :class="{ 'opacity-50 cursor-not-allowed': !request.isCancellable }"
-                  :disabled="!request.isCancellable"
+                  :class="{ 'opacity-50 cursor-not-allowed': !isRequestCancellable(request) }"
+                  :disabled="!isRequestCancellable(request)"
                   title="Cancelar"
                 >
                   <svg

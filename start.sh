@@ -79,16 +79,6 @@ for i in {1..5}; do
   fi
 done
 
-# Exibindo credenciais de acesso ao final do script
-cat <<EOF
-
-🔑 Credenciais de acesso - Super Admin:
-Usuário: onfly@onfly.com.br
-Senha: 123456
-
-Acesse o sistema com essas credenciais para perfil administrativo.
-EOF
-
 # Pausa pra criar suspense
 sleep 2
 
