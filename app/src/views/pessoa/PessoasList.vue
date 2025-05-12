@@ -234,11 +234,12 @@ const confirmDeletePessoa = async () => {
               <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
                 {{ pessoa.id }}
               </td>
-              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ pessoa.name }}</td>
-              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ pessoa.email }}</td>
               <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                {{ pessoa.company_name || 'N/A' }}
+                <span class="block font-medium text-gray-900">{{ pessoa.name }}</span>
+                <span class="block text-xs text-gray-500">{{ pessoa.company_name || 'N/A' }}</span>
               </td>
+
+              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ pessoa.email }}</td>
               <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 flex items-center gap-2">
                 <span v-if="pessoa.is_super_admin" title="Super Admin" class="flex items-center">
                   <svg
