@@ -11,7 +11,73 @@ Frontend: Uma interface dinâmica em Vue.js, conectada à API via http://api:800
 Banco de Dados: PostgreSQL, armazenando dados com robustez.
 Filas: Redis, garantindo que as filas do Horizon rodem lisas como purpurina.
 
-Ideal para aprender, prototipar, ou simplesmente se divertir enfrentando conflitos de porta e gremlins do Docker! 🪦
+---
+
+## 🧩 Tecnologias Utilizadas
+
+### `/api` — Backend (Laravel + Vite + Tailwind)
+
+O diretório `/api` implementa a API principal da plataforma, baseada em PHP com o framework Laravel. A stack é moderna e integra ferramentas de frontend para assets, além de autenticação robusta e filas assíncronas.
+
+**Principais tecnologias e ferramentas:**
+
+- **PHP 8.2+** — Linguagem principal do backend.
+- **Laravel 12** — Framework MVC para construção de APIs e aplicações web robustas.
+- **Laravel Horizon** — Gerenciamento e monitoramento de filas (queues) com Redis.
+- **Laravel Sanctum** — Autenticação via tokens para SPAs e APIs.
+- **JWT Auth** — Autenticação baseada em JSON Web Tokens.
+- **Vite** — Bundler moderno para assets frontend, integrado ao Laravel via `laravel-vite-plugin`.
+- **TailwindCSS** — Framework utilitário para estilização CSS.
+- **Axios** — Cliente HTTP para requisições assíncronas no frontend.
+- **Composer** — Gerenciador de dependências PHP.
+- **NPM** — Gerenciador de pacotes JS para assets e ferramentas frontend.
+- **Docker** — Containerização para ambientes de desenvolvimento e produção.
+- **PHPUnit** — Testes automatizados.
+- **Faker** — Geração de dados fake para testes.
+- **Mockery** — Mock de objetos para testes.
+- **Laravel Sail** — Ambiente de desenvolvimento Docker para Laravel.
+- **Concurrently** — Execução paralela de scripts (npm, artisan, etc).
+
+**Arquitetura e padrões:**
+- Estrutura MVC.
+- PSR-4 autoload.
+- Scripts automatizados para build, testes, seed e deploy.
+- Configuração via arquivos `.env`.
+- Integração frontend/backend via Vite.
+
+---
+
+### `/app` — Frontend (Vue 3 + TypeScript + Vite + Tailwind)
+
+O diretório `/app` implementa o frontend principal, utilizando uma stack moderna baseada em Vue.js, TypeScript e ferramentas de build e estilização de última geração.
+
+**Principais tecnologias e ferramentas:**
+
+- **Vue 3** — Framework progressivo para interfaces reativas.
+- **TypeScript** — Superset do JavaScript com tipagem estática.
+- **Vite** — Bundler ultrarrápido para desenvolvimento e build.
+- **Vue Router** — Gerenciamento de rotas SPA.
+- **Axios** — Cliente HTTP para integração com APIs.
+- **TailwindCSS** — Framework utilitário para CSS.
+- **PostCSS** — Processamento avançado de CSS.
+- **Autoprefixer** — Inclusão automática de prefixos CSS.
+- **Heroicons** — Biblioteca de ícones SVG para Vue.
+- **ESLint** — Linter para padronização de código.
+- **Prettier** — Formatador de código.
+- **Vue TSC** — Checagem de tipos TypeScript para Vue.
+- **Vite Plugin Vue Devtools** — Ferramentas de desenvolvimento para Vue integradas ao Vite.
+- **npm-run-all2** — Execução paralela/sequencial de scripts npm.
+- **Docker** — Containerização do frontend.
+
+**Arquitetura e padrões:**
+- SPA (Single Page Application).
+- Estrutura modular em `/src`.
+- Alias de importação com `@`.
+- Configuração avançada de build e lint.
+- Suporte a hot reload e devtools.
+- Configuração de múltiplos ambientes via `.env`.
+
+---
 🛠️ Pré-requisitos
 Antes de mergulhar, você vai precisar de:
 
