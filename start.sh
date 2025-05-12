@@ -59,6 +59,7 @@ sleep 10
 echo "🩺 Checando o pulso da API em http://127.0.0.1:8000/api/healthcheck..."
 for i in {1..5}; do
   RESPONSE=$(curl -s -o /dev/null -w "%{http_code}" http://127.0.0.1:8000/api/healthcheck)
+
   if [ "$RESPONSE" -eq 200 ]; then
     BODY=$(curl -s http://127.0.0.1:8000/api/healthcheck)
     if echo "$BODY" | grep -qi "ok"; then
@@ -77,6 +78,16 @@ for i in {1..5}; do
     echo "😱 Três strikes, API tá fora! Verifique os logs com 'docker logs laravel_api' e veja se o .env ou o PostgreSQL tão aprontando."
   fi
 done
+
+# Exibindo credenciais de acesso ao final do script
+cat <<EOF
+
+🔑 Credenciais de acesso - Super Admin:
+Usuário: onfly@onfly.com.br
+Senha: 123456
+
+Acesse o sistema com essas credenciais para perfil administrativo.
+EOF
 
 # Pausa pra criar suspense
 sleep 2

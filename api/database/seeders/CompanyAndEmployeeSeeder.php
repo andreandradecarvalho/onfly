@@ -5,6 +5,7 @@ namespace Database\Seeders;
 use App\Models\Company;
 use App\Models\User;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
 
@@ -53,6 +54,8 @@ class CompanyAndEmployeeSeeder extends Seeder
             }
         }
 
+        $positionIds = DB::table('position_companies')->pluck('id')->toArray();
+
         // Cria funcionários para cada empresa
         foreach ($createdCompanies as $company) {
             for ($i = 1; $i <= 5; $i++) {
@@ -68,9 +71,18 @@ class CompanyAndEmployeeSeeder extends Seeder
                         'created_at' => now(),
                     ]
                 );
+                // Seleciona aleatoriamente um cargo
+                $positionId = $positionIds[array_rand($positionIds)];
 
-                // Adiciona usuário a empresa
-                $user->companies()->syncWithoutDetaching([$company->id]);
+                // Vincula usuário à empresa
+                DB::table('company_user')->insert([
+                    'user_id' => $user->id,
+                    'company_id' => $company->id,
+                    'position_companies_id' => $positionId,
+                    'is_primary' => $i === 0, // Primeiro funcionário é primário
+                    'created_at' => now(),
+                    'updated_at' => now()
+                ]);
             }
         }
 
@@ -82,7 +94,7 @@ class CompanyAndEmployeeSeeder extends Seeder
 
 
 
-        // Cria um admin para cada empresa
+        // Cria um Super Admin para cada empresa
         foreach ($createdCompanies as $company) {
             $adminEmail = Str::lower(Str::slug($company->name)) . ".superadmin@example.com";
             $adminUser = User::updateOrCreate(

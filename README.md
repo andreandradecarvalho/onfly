@@ -78,7 +78,77 @@ O diretório `/app` implementa o frontend principal, utilizando uma stack modern
 - Configuração de múltiplos ambientes via `.env`.
 
 ---
-🛠️ Pré-requisitos
+
+## 📡 Rotas da API (`/api`)
+
+### Rotas Gerais
+
+- **GET `/api/healthcheck`**
+  - Retorna um JSON simples para verificação de saúde da API.
+
+### Rotas Versão 1 (`/api/v1`)
+
+#### Raiz
+
+- **GET `/api/v1/`**  
+- **POST `/api/v1/`**  
+  - Ambas retornam mensagem de erro indicando que não há conteúdo na raiz da v1.
+
+- **GET `/api/v1/healthcheck`**
+  - Verifica a saúde da API v1, retornando um JSON `["ok"]`.
+
+#### Autenticação (`/api/v1/auth`)
+
+- **POST `/api/v1/auth/register`**  
+  - Registra um novo usuário.
+- **POST `/api/v1/auth/login`**  
+  - Realiza login e retorna token JWT.
+- **POST `/api/v1/auth/refresh`**  
+  - (Autenticado) Atualiza o token JWT.
+- **POST `/api/v1/auth/logout`**  
+  - (Autenticado) Realiza logout do usuário.
+- **GET `/api/v1/auth/user`**  
+  - (Autenticado) Retorna dados do usuário autenticado.
+- **GET `/api/v1/auth/me`**  
+  - (Autenticado) Retorna dados do usuário autenticado (alias para `/user`).
+
+#### Empresas (`/api/v1/companies`)
+
+- **GET `/api/v1/companies`**  
+  - (Autenticado) Lista todas as empresas.
+- **POST `/api/v1/companies`**  
+  - (Autenticado) Cria uma nova empresa.
+- **GET `/api/v1/companies/{id}`**  
+  - (Autenticado) Detalha uma empresa específica.
+- **PUT `/api/v1/companies/{id}`**  
+  - (Autenticado) Atualiza dados de uma empresa.
+- **DELETE `/api/v1/companies/{id}`**  
+  - (Autenticado) Remove uma empresa.
+- **GET `/api/v1/companies/{company}/positions`**  
+  - (Autenticado) Lista cargos (positions) de uma empresa.
+
+#### Usuários (`/api/v1/users`)
+
+- **GET `/api/v1/users`**  
+  - (Autenticado) Lista todos os usuários.
+- **POST `/api/v1/users`**  
+  - (Autenticado) Cria um novo usuário.
+- **GET `/api/v1/users/{id}`**  
+  - (Autenticado) Detalha um usuário específico.
+- **PUT `/api/v1/users/{id}`**  
+  - (Autenticado) Atualiza dados de um usuário.
+- **DELETE `/api/v1/users/{id}`**  
+  - (Autenticado) Remove um usuário.
+
+#### Cargos (`/api/v1/positions`)
+
+- **GET `/api/v1/positions`**  
+  - (Autenticado) Lista todos os cargos.
+- **GET `/api/v1/positions/{id}`**  
+  - (Autenticado) Detalha um cargo específico.
+
+---
+ 🛠️ Pré-requisitos
 Antes de mergulhar, você vai precisar de:
 
 Docker e Docker Compose: Para rodar os contêineres como um maestro. 🐳
