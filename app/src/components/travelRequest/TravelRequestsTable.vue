@@ -89,6 +89,7 @@ const fetchTravelRequests = async () => {
       (item: {
         id: number
         order_id: string
+        user_id: number
         user?: { name?: string; email?: string; companies?: { name?: string }[] }
         origin: string
         destination: string
@@ -100,6 +101,7 @@ const fetchTravelRequests = async () => {
         return {
           id: item.id,
           orderId: item.order_id,
+          user_id: item.user_id,
           userName: item.user?.name || '',
           userEmail: item.user?.email || '',
           companyName: item.user?.companies?.[0]?.name || '',
@@ -208,21 +210,53 @@ const filterRequests = () => {
   }
 
   if (filterDestination.value) {
-    tempRequests = tempRequests.filter((req) =>
-      req.destination.toLowerCase().includes(filterDestination.value.toLowerCase()),
+    const filterValue = filterDestination.value.toLowerCase().trim()
+    // Debug: mostrar origem e destino disponíveis
+    console.log(
+      'Origens disponíveis:',
+      tempRequests.map((req) => req.origin),
     )
+    console.log(
+      'Destinos disponíveis:',
+      tempRequests.map((req) => req.destination),
+    )
+    tempRequests = tempRequests.filter((req) => {
+      const origin = req.origin ? req.origin.toLowerCase().trim() : ''
+      const destination = req.destination ? req.destination.toLowerCase().trim() : ''
+      return origin.includes(filterValue) || destination.includes(filterValue)
+    })
   }
 
   if (filterStartDate.value) {
-    tempRequests = tempRequests.filter(
-      (req) => new Date(req.departureDate) >= new Date(filterStartDate.value),
-    )
+    const filterDate = parseDate(filterStartDate.value)
+    tempRequests = tempRequests.filter((req) => {
+      const reqDate = parseDate(req.departureDate)
+      return reqDate >= filterDate
+    })
+  }
+
+  // Função utilitária para converter datas em 'yyyy-mm-dd' ou 'dd/mm/yyyy' para objeto Date
+  function parseDate(dateStr: string): Date {
+    if (!dateStr) return new Date('1900-01-01')
+    if (dateStr.includes('-')) {
+      // yyyy-mm-dd
+      return new Date(dateStr)
+    }
+    if (dateStr.includes('/')) {
+      // dd/mm/yyyy
+      const [d, m, y] = dateStr.split('/').map(Number)
+      return new Date(y, m - 1, d)
+    }
+    // fallback
+    return new Date(dateStr)
   }
 
   if (filterEndDate.value) {
-    tempRequests = tempRequests.filter(
-      (req) => new Date(req.departureDate) <= new Date(filterEndDate.value),
-    )
+    const filterDate = parseDate(filterEndDate.value)
+    tempRequests = tempRequests.filter((req) => {
+      const reqDate = parseDate(req.departureDate)
+      return reqDate <= filterDate
+    })
   }
 
   if (filterCreatedStartDate.value) {
@@ -327,18 +361,70 @@ function showAlert({
     </div>
   </div>
   <TravelRequestsFilter
-    :filterDestination="filterDestination.value"
-    :filterStartDate="filterStartDate.value"
-    :filterEndDate="filterEndDate.value"
-    :filterCreatedStartDate="filterCreatedStartDate.value"
-    :filterCreatedEndDate="filterCreatedEndDate.value"
-    :selectedStatus="selectedStatus.value"
+    :filterDestination="filterDestination"
+    :filterStartDate="filterStartDate"
+    :filterEndDate="filterEndDate"
+    :filterCreatedStartDate="filterCreatedStartDate"
+    :filterCreatedEndDate="filterCreatedEndDate"
+    :selectedStatus="selectedStatus"
     :statusOptions="statusOptions"
-    @update:filterDestination="(val) => (filterDestination.value = val)"
-    @update:filterStartDate="(val) => (filterStartDate.value = val)"
-    @update:filterEndDate="(val) => (filterEndDate.value = val)"
-    @update:filterCreatedStartDate="(val) => (filterCreatedStartDate.value = val)"
-    @update:filterCreatedEndDate="(val) => (filterCreatedEndDate.value = val)"
+    @update:filterDestination="
+      (val) => {
+        if (
+          filterDestination &&
+          typeof filterDestination === 'object' &&
+          'value' in filterDestination
+        ) {
+          filterDestination.value = val
+        } else {
+          filterDestination = val
+        }
+      }
+    "
+    @update:filterStartDate="
+      (val) => {
+        if (filterStartDate && typeof filterStartDate === 'object' && 'value' in filterStartDate) {
+          filterStartDate.value = val
+        } else {
+          filterStartDate = val
+        }
+      }
+    "
+    @update:filterEndDate="
+      (val) => {
+        if (filterEndDate && typeof filterEndDate === 'object' && 'value' in filterEndDate) {
+          filterEndDate.value = val
+        } else {
+          filterEndDate = val
+        }
+      }
+    "
+    @update:filterCreatedStartDate="
+      (val) => {
+        if (
+          filterCreatedStartDate &&
+          typeof filterCreatedStartDate === 'object' &&
+          'value' in filterCreatedStartDate
+        ) {
+          filterCreatedStartDate.value = val
+        } else {
+          filterCreatedStartDate = val
+        }
+      }
+    "
+    @update:filterCreatedEndDate="
+      (val) => {
+        if (
+          filterCreatedEndDate &&
+          typeof filterCreatedEndDate === 'object' &&
+          'value' in filterCreatedEndDate
+        ) {
+          filterCreatedEndDate.value = val
+        } else {
+          filterCreatedEndDate = val
+        }
+      }
+    "
     @update:selectedStatus="onStatusChange"
   />
 
@@ -354,7 +440,7 @@ function showAlert({
 
     <div v-else class="overflow-x-auto">
       <FlightTicketItemsTable
-        :requests="processedFilteredRequests"
+        :requests="filteredRequests"
         :canUpdateStatus="canUpdateStatus"
         @confirm-update-status="handleConfirmUpdateStatus"
       />
