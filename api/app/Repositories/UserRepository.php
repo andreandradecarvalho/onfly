@@ -14,7 +14,7 @@ class UserRepository implements UserRepositoryInterface
         $this->user = $user;
     }
 
-    public function create(array $data)
+    public function create(mixed $data)
     {
         $user = $this->user->create([
             'name' => $data['name'],

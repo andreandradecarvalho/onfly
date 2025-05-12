@@ -69,8 +69,8 @@ class CompanyService
             {
                 $company = Company::findOrFail($id);
 
-                // Optional: Add authorization check
                 $user = Auth::user();
+
                 if (!$user->isSuperAdmin() && !$user->companies->contains($company)) {
                     throw new \Exception('Unauthorized to update this company');
                 }

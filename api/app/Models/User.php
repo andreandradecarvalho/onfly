@@ -96,6 +96,6 @@ class User extends Authenticatable implements JWTSubject
      */
     public function isSuperAdmin(): bool
     {
-        return $this->is_super_admin === true;
+        return ($this->is_super_admin === true || $this->is_super_admin === 1);
     }
 }

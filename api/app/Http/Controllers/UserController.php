@@ -34,6 +34,7 @@ class UserController extends Controller
      */
     public function store(StoreUserRequest $request) // Change Request to StoreUserRequest
     {
+
         // Validation is now handled by StoreUserRequest
         $validatedData = $request->validated();
 

@@ -81,12 +81,14 @@ class CompanyController extends Controller
     {
         try {
             $validatedData = $request->validated();
+
             $company = $this->companyService->updateCompany($id, $validatedData);
 
             return response()->json([
                 'message' => 'Empresa atualizada com sucesso',
                 'data' => $company
             ], 200);
+
         } catch (ValidationException $e) {
             return response()->json([
                 'message' => 'Erro de validação',
