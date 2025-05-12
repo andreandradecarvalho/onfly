@@ -17,7 +17,7 @@ Filas: Redis, garantindo que as filas do Horizon rodem lisas como purpurina.
 
 ### Apresentação
 Veja uma apresentação do aplicativo:
-- 🎥 [Assista ao vídeo de demonstração](https://www.loom.com/share/a41e651986994e39abfeb1caf9c9a8a3?sid=277d2896-6f43-45fd-abf9-9f65acdacaec)
+- 🎥 [Assista ao vídeo de demonstração](https://www.loom.com/share/46804323710c4cddb6b2f42e57491eef?sid=4159bac0-9870-447c-a73b-9cafccc382e8)
 
 ### Onfly API e Configurações 🚀
 Explore a configuração técnica e a API:
