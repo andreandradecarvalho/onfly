@@ -13,6 +13,22 @@ Filas: Redis, garantindo que as filas do Horizon rodem lisas como purpurina.
 
 ---
 
+## 📹 Demonstrações em Vídeo
+
+### Apresentação
+Veja uma apresentação do aplicativo:
+- 🎥 [Assista ao vídeo de demonstração](https://www.loom.com/share/a41e651986994e39abfeb1caf9c9a8a3?sid=277d2896-6f43-45fd-abf9-9f65acdacaec)
+
+### Onfly API e Configurações 🚀
+Explore a configuração técnica e a API:
+- 🎥 [Assista ao vídeo de configuração](https://www.loom.com/share/c5b2d586bc3545ada8ae2dc11f6e8b22?sid=dabb2db0-2bdc-4fee-bc62-f7df986be1a5)
+
+### Demonstração Detalhada do APP
+Para uma visão mais aprofundada das funcionalidades:
+- 🎥 [Assista ao vídeo detalhado](https://www.loom.com/share/a41e651986994e39abfeb1caf9c9a8a3?sid=277d2896-6f43-45fd-abf9-9f65acdacaec)
+
+
+
 ## 🧩 Tecnologias Utilizadas
 
 ### `/api` — Backend (Laravel + Vite + Tailwind)
